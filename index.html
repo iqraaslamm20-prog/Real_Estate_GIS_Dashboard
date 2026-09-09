@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Real Estate GIS Dashboard</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+        }
+
+        /* Top Header */
+        .header {
+            height: 70px;
+           background-color: #0057A8;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+        }
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.company-logo {
+    height: 55px;
+    width: auto;
+    object-fit: contain;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.company-name {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+.dashboard-title {
+    font-size: 13px;
+    margin-top: 4px;
+    opacity: 0.85;
+    letter-spacing: 0.2px;
+}
+.company-logo {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+    background-color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.header-icons {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-size: 20px;
+}
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+.sidebar {
+    width: 230px;
+    background-color: #ffffff;
+    border-right: 1px solid #ddd;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+.sidebar-logo {
+    margin-top: auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.sidebar-logo img {
+    width: 150px;
+    height: auto;
+    object-fit: contain;
+}
+       .menu-item {
+    display: block;
+    padding: 15px 25px;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #1f2937;
+}
+
+        .menu-item:hover {
+            background-color: #f0f2f5;
+        }
+
+        .menu-item.active {
+            background-color: #e5e7eb;
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .content h1 {
+            font-size: 28px;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .content p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+        /* Welcome Text */
+.welcome-text {
+    margin-bottom: 25px;
+}
+
+
+/* Overview Cards */
+.cards {
+    display: flex;
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.card {
+    background-color: white;
+    width: 220px;
+    padding: 22px;
+    border-radius: 10px;
+    border: 1px solid #e1e5e8;
+}
+
+.card-title {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 12px;
+}
+
+.card-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #1f2937;
+}
+.card-detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.card-detail strong {
+    font-size: 16px;
+    color: #1f2937;
+}
+.main-number {
+    font-size: 32px;
+    font-weight: 700;
+    color: #0057A8;
+    margin-top: 8px;
+}
+
+.main-label {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 18px;
+}
+
+.status-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #4b5563;
+}
+
+.status-row strong {
+    margin-left: auto;
+    color: #1f2937;
+    font-size: 15px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.active-dot {
+    background-color: #22c55e;
+}
+
+.planning-dot {
+    background-color: #f59e0b;
+}
+/* GIS Map Section */
+.map-section {
+    background-color: white;
+    margin-top: 30px;
+    border: 1px solid #e1e5e8;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.map-header {
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid #e1e5e8;
+}
+
+.map-header h2 {
+    font-size: 18px;
+    color: #1f2937;
+}
+
+.map-header span {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+#map {
+    height: 400px;
+    width: 100%;
+}
+/* Project Popup */
+
+.project-popup {
+    min-width: 230px;
+}
+
+.project-popup h3 {
+    margin-bottom: 8px;
+    font-size: 18px;
+    color: #1f2937;
+}
+
+.project-popup .location {
+    color: #6b7280;
+    margin-bottom: 15px;
+}
+
+.project-info {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 10px;
+}
+
+.project-info div {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.project-info span {
+    color: #6b7280;
+}
+
+.project-info strong {
+    color: #1f2937;
+}
+
+.details-button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 9px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #1f2937;
+    color: white;
+}
+
+.details-button:hover {
+    background-color: #374151;
+}
+.welcome-section {
+    margin-bottom: 30px;
+}
+
+.welcome-section h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 8px;
+}
+
+.welcome-section p {
+    font-size: 15px;
+    color: #6b7280;
+    max-width: 750px;
+    line-height: 1.6;
+}
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <div class="header">
+    <div class="brand">
+
+        <div class="brand-text">
+            <div class="company-name">
+                UNION DEVELOPERS (PVT.) LIMITED
+            </div>
+            <div class="dashboard-title">
+                Real Estate GIS Dashboard
+            </div>
+        </div>
+    </div>
+
+ <div class="header-icons">
+    <span>🔔</span>
+    <span>👤</span>
+</div>
+</div>
+
+
+    <!-- Main Container -->
+    <div class="main-container">
+
+    <div class="sidebar">
+
+    <a href="index.html" class="menu-item active">🏠 Home</a>
+    <a href="projects.html" class="menu-item">🏗️ Projects</a>
+    <a href="map.html" class="menu-item">🗺️ Map</a>
+    <a href="analytics.html" class="menu-item">📊 Analytics</a>
+    <a href="details.html" class="menu-item">📋 Details</a>
+    <a href="reports.html" class="menu-item">📑 Reports</a>
+
+    <div class="sidebar-logo">
+        <img src="images/union-developers-logo.png"
+             alt="Union Developers Logo">
+    </div>
+
+</div>
+
+        <!-- Main Content -->
+<div class="content">
+    <div class="welcome-section">
+
+   <h1>Top Real Estate Developers in Pakistan Since 2004</h1>
+
+<p> MIAN AMER MAHMOOD<br> CHAIRMAN<br><br> NAEEM AHMAD MALIK<br> CHIEF EXECUTIVE OFFICER </p>
+
+
+</div>
+
+    <h1>Real Estate Projects</h1>
+
+    <p class="welcome-text">
+        Overview of real estate projects and GIS information
+    </p>
+
+
+    <!-- Overview Cards -->
+    <div class="cards">
+
+<div class="card project-card">
+    <div class="card-title">PROJECTS</div>
+
+    <div class="main-number">8</div>
+    <div class="main-label">Total Projects</div>
+
+    <div class="status-row">
+        <span class="status-dot active-dot"></span>
+        <span>Active</span>
+        <strong>7</strong>
+    </div>
+
+    <div class="status-row">
+        <span class="status-dot planning-dot"></span>
+        <span>Planning</span>
+        <strong>1</strong>
+    </div>
+</div>
+
+        <div class="card">
+            <div class="card-title">TOTAL AREA</div>
+            <div class="card-value">2,450 A</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">LOCATIONS</div>
+            <div class="card-value">8</div>
+        </div>
+
+    </div>
+<!-- GIS Map Section -->
+<div class="map-section">
+
+    <div class="map-header">
+        <h2>GIS Project Map</h2>
+        <span>Project Locations</span>
+    </div>
+
+
+
+</div>
+
+</div>
+
+    </div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    var map = L.map('map').setView([31.5204, 74.3587], 10);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+ // Real Estate Projects
+
+var projects = [
+
+    {
+        name: "Sample Housing Project A",
+        location: "Lahore",
+        developer: "ABC Developers",
+        area: "250 Acres",
+        status: "Active",
+        coordinates: [31.4697, 74.2728]
+    },
+
+    {
+        name: "Sample Housing Project B",
+        location: "Lahore",
+        developer: "XYZ Developers",
+        area: "400 Acres",
+        status: "Active",
+        coordinates: [31.4900, 74.3100]
+    },
+
+    {
+        name: "Sample Housing Project C",
+        location: "Lahore",
+        developer: "DEF Developers",
+        area: "180 Acres",
+        status: "Planning",
+        coordinates: [31.4500, 74.3500]
+    }
+
+];
+
+
+// Create markers for all projects
+
+projects.forEach(function(project) {
+
+    var marker = L.marker(project.coordinates).addTo(map);
+
+    marker.bindPopup(`
+        <div class="project-popup">
+
+            <h3>${project.name}</h3>
+
+            <p class="location">
+                📍 ${project.location}
+            </p>
+
+            <div class="project-info">
+
+                <div>
+                    <span>Developer</span>
+                    <strong>${project.developer}</strong>
+                </div>
+
+                <div>
+                    <span>Total Area</span>
+                    <strong>${project.area}</strong>
+                </div>
+
+                <div>
+                    <span>Status</span>
+                    <strong>${project.status}</strong>
+                </div>
+
+            </div>
+
+            <button class="details-button">
+                View Details
+            </button>
+
+        </div>
+    `);
+
+});
+</script>
+</body>
+</html>
